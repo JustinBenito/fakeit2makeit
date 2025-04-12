@@ -18,6 +18,8 @@ export function MermaidChart({ code }: MermaidChartProps) {
       theme: "default",
       securityLevel: "loose",
       fontFamily: "Virgil",
+      look: "handDrawn",
+
     })
 
     const renderChart = async () => {
@@ -35,8 +37,16 @@ export function MermaidChart({ code }: MermaidChartProps) {
   }, [code])
 
   if (error) {
+    console.log(chartId.current)
     return <div className="p-4 text-red-500 border border-red-300 rounded-md">{error}</div>
   }
 
-  return <div className="mermaid-chart" dangerouslySetInnerHTML={{ __html: svg }} />
+  return (
+    <div className="mermaid-chart-container ">
+      <div 
+        className="mermaid-chart mx-auto " 
+        dangerouslySetInnerHTML={{ __html: svg }} 
+      />
+    </div>
+  )
 }

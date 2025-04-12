@@ -1,7 +1,3 @@
-"use client"
-
-import type React from "react"
-
 import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -31,100 +27,87 @@ export function DocumentEditor({ content, setContent, onElementClick }: Document
   const contentRef = useRef<HTMLDivElement>(null)
 
   // Split content into multiple pages if needed
-useEffect(() => {
-  // if (!contentRef.current || typeof window === 'undefined') return
-  const splitContentIntoPages = () => {
-    // Handle empty content case
-    console.log("Splitting content into pages...")
-    if (!content.html && content.charts.length === 0) {
-      setPages([""])
-      console.log("No content, setting empty page")
-      return
-    }
+  useEffect(() => {
+    const splitContentIntoPages = () => {
+      console.log("Splitting content into pages...")
+      if (!content.html && content.charts.length === 0) {
+        setPages([""])
+        console.log("No content, setting empty page")
+        return
+      }
 
-    try {
-      const tempDiv = document.createElement("div")
-      tempDiv.className = "a4-content font-virgil"
-      tempDiv.innerHTML = content.html || ""
-      console.log("Content HTML:", content.html)
-      // Only process charts if they exist
-      if (content.charts.length > 0) {
-        content.charts.forEach((chart) => {
-          const chartPlaceholder = tempDiv.querySelector(`[data-chart-id="${chart.id}"]`)
-          if (chartPlaceholder) {
+      try {
+        const tempDiv = document.createElement("div")
+        tempDiv.className = "a4-content font-virgil"
+        tempDiv.innerHTML = content.html || ""
+
+        // Create pages array preserving original order
+        const newPages: string[] = []
+        
+        // Process all content (text and charts) in order
+        const textContent = tempDiv.innerHTML
+        const words = textContent ? textContent.split(/\s+/) : []
+        const wordsPerPage = 220
+        let currentPageWords: string[] = []
+        let currentPageDiv = document.createElement("div")
+        currentPageDiv.className = "a4-page"
+        
+        // Process words and charts together
+        let wordIndex = 0
+        let chartIndex = 0
+        
+        while (wordIndex < words.length || chartIndex < content.charts.length) {
+          // Add words to current page until full or no more words
+          if (wordIndex < words.length) {
+            const remainingSpace = wordsPerPage - currentPageWords.length
+            const wordsToAdd = words.slice(wordIndex, wordIndex + remainingSpace)
+            currentPageWords.push(...wordsToAdd)
+            wordIndex += wordsToAdd.length
+            
+            // Update page content with current words
+            currentPageDiv.innerHTML = currentPageWords.join(" ")
+          }
+          
+          // Check if we can add a chart to current page
+          if (chartIndex < content.charts.length && 
+              (wordsPerPage - currentPageWords.length) > wordsPerPage * 0.3) {
+            const chart = content.charts[chartIndex]
             const chartContainer = document.createElement("div")
-            chartContainer.className = "my-4"
-            chartContainer.setAttribute("data-chart", chart.code)
-            chartPlaceholder.replaceWith(chartContainer)
+            chartContainer.className = "mermaid-chart-container"
+            chartContainer.innerHTML = `
+              <div class="mermaid-chart" data-chart-id="${chart.id}"></div>
+            `
+            currentPageDiv.appendChild(chartContainer)
+            chartIndex++
           }
-        })
-      }
-
-      // Append to document body temporarily for height calculation
-      tempDiv.style.visibility = 'hidden'
-      tempDiv.style.position = 'absolute'
-      document.body.appendChild(tempDiv)
-
-      // Calculate how many pages we need
-      const contentHeight = tempDiv.scrollHeight || 0
-      const pageHeight = 1043 // A4 height in pixels minus padding
-      // Ensure pageCount is at least 1 if we have content, even if height calculation returns 0
-      const pageCount = content.html || content.charts.length > 0 ? Math.max(1, Math.ceil(contentHeight / pageHeight)) : 0
-
-      // Create pages
-      const newPages: string[] = []
-      const contentElements = Array.from(tempDiv.children)
-
-      if (contentElements.length === 0 && content.html) {
-        // If no elements but we have HTML content, push the entire content
-        newPages.push(content.html)
-      } else if (pageCount <= 1) {
-        // If content fits in one page
-        newPages.push(tempDiv.innerHTML)
-      } else {
-        let currentPage = ""
-        let currentHeight = 0
-
-        contentElements.forEach((element) => {
-          const elementHeight = element.scrollHeight || 0
-
-          if (currentHeight + elementHeight > pageHeight && currentPage) {
-            newPages.push(currentPage)
-            currentPage = element.outerHTML
-            currentHeight = elementHeight
-          } else {
-            currentPage += element.outerHTML
-            currentHeight += elementHeight
+          
+          // If page is full or no more content, add to pages
+          if (currentPageWords.length >= wordsPerPage || 
+              (wordIndex >= words.length && chartIndex >= content.charts.length)) {
+            newPages.push(currentPageDiv.outerHTML)
+            currentPageWords = []
+            currentPageDiv = document.createElement("div")
+            currentPageDiv.className = "a4-page"
           }
-        })
-
-        if (currentPage) {
-          newPages.push(currentPage)
         }
+
+        setPages(newPages)
+        console.log("Content split into", newPages.length, "pages")
+      } catch (error) {
+        console.error('Error splitting content into pages:', error)
+        setPages([content.html || ""])
       }
-
-      // Clean up
-      document.body.removeChild(tempDiv)
-      setPages(newPages)
-      console.log("Content split into", pageCount, "pages")
-    } catch (error) {
-      console.error('Error splitting content into pages:', error)
-      setPages([content.html || ""])
     }
-  }
 
-  // Run the split function
-  splitContentIntoPages()
-}, [content.html, content.charts])
+    // Run the split function
+    splitContentIntoPages()
+  }, [content.html, content.charts])
 
   const handleExportPdf = () => {
     if (documentRef.current) {
       exportToPdf(documentRef.current)
     }
   }
-
-
-  console.log(!contentRef.current)
 
   return (
     <div className="container mx-auto max-w-5xl">
@@ -142,7 +125,7 @@ useEffect(() => {
       </div>
 
       <div ref={documentRef} className="space-y-8">
-        {!content.html && content.charts.length === 0 ? (
+        {!content.html && (!content.charts || content.charts.length === 0) ? (
           <Card className="p-8 text-center">
             <p>No content available</p>
           </Card>
@@ -158,21 +141,14 @@ useEffect(() => {
                 onClick={() => onElementClick("text")}
                 ref={index === 0 ? contentRef : undefined}
               >
-                <div dangerouslySetInnerHTML={{ __html: pageHtml }} />
+                 <div dangerouslySetInnerHTML={{ __html: pageHtml }} />
+                {pageHtml.includes('mermaid-chart') && (
+                  <div className="mermaid-chart-page w-full scale-75 max-w-[21cm] max-h-[30.7cm] overflow-clip">
+                    <MermaidChart code={content.charts.find(c => pageHtml.includes(c.id))?.code || ''} />
+                  </div>
+                )}
 
-                {index === 0 &&
-                  content.charts.map((chart) => (
-                    <div
-                      key={chart.id}
-                      className="my-4"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        onElementClick("chart-" + chart.id)
-                      }}
-                    >
-                      <MermaidChart code={chart.code} />
-                    </div>
-                  ))}
+                
               </div>
             </div>
           ))
@@ -181,3 +157,4 @@ useEffect(() => {
     </div>
   )
 }
+const content = { html: '', charts: [] }; // Initialize content with default values

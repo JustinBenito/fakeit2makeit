@@ -67,7 +67,7 @@
 
 .a4-paper {
   width: 100%;
-  max-width: 794px; /* A4 width in pixels at 96 DPI */
+  max-width: 1794px; /* A4 width in pixels at 96 DPI */
   height: 1123px; /* A4 height in pixels at 96 DPI */
   background-color: white;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
@@ -79,7 +79,7 @@
 .a4-content {
   padding: 40px;
   height: 100%;
-  overflow: hidden;
+  overflow: scroll;
   cursor: pointer;
 }
 
