@@ -1,0 +1,205 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import './fonts.css';
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.5% 48%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-poppins), sans-serif;
+  }
+}
+
+.font-virgil {
+  font-family: "Virgil", sans-serif;
+}
+
+.a4-paper {
+  width: 100%;
+  max-width: 794px; /* A4 width in pixels at 96 DPI */
+  height: 1123px; /* A4 height in pixels at 96 DPI */
+  background-color: white;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+}
+
+.a4-content {
+  padding: 40px;
+  height: 100%;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+/* Markdown styling */
+.a4-content h1 {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  margin-top: 1.5rem;
+}
+
+.a4-content h2 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.a4-content h3 {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  margin-top: 1rem;
+}
+
+.a4-content p {
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.a4-content ul,
+.a4-content ol {
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+}
+
+.a4-content ul {
+  list-style-type: disc;
+}
+
+.a4-content ol {
+  list-style-type: decimal;
+}
+
+.a4-content li {
+  margin-bottom: 0.25rem;
+}
+
+.a4-content strong {
+  font-weight: bold;
+}
+
+.a4-content em {
+  font-style: italic;
+}
+
+.a4-content blockquote {
+  border-left: 4px solid #e2e8f0;
+  padding-left: 1rem;
+  margin-left: 0;
+  margin-right: 0;
+  font-style: italic;
+  margin-bottom: 1rem;
+}
+
+.a4-content code {
+  font-family: monospace;
+  background-color: #f1f5f9;
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.25rem;
+  font-size: 0.875em;
+}
+
+.a4-content pre {
+  background-color: #f1f5f9;
+  padding: 1rem;
+  border-radius: 0.25rem;
+  overflow-x: auto;
+  margin-bottom: 1rem;
+}
+
+.a4-content pre code {
+  background-color: transparent;
+  padding: 0;
+}
+
+.a4-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+}
+
+.a4-content th,
+.a4-content td {
+  border: 1px solid #e2e8f0;
+  padding: 0.5rem;
+}
+
+.a4-content th {
+  background-color: #f8fafc;
+  font-weight: bold;
+}
+
+.a4-content img {
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 1rem;
+}
+
+.a4-content hr {
+  border: 0;
+  border-top: 1px solid #e2e8f0;
+  margin: 1.5rem 0;
+}
+
+.a4-content a {
+  color: #3b82f6;
+  text-decoration: underline;
+}
+
+.mermaid-chart {
+  margin: 1rem 0;
+}

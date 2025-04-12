@@ -1,0 +1,11 @@
+@font-face {
+    font-family: 'Virgil';
+    src: url('https://excalidraw.com/Virgil.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+  
+  * {
+    font-family: 'Virgil', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
