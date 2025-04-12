@@ -16,6 +16,10 @@ export async function generateContent(prompt: string): Promise<string> {
               parts: [
                 {
                   text: `${prompt}. 
+
+                You are an expert at generating assignments for students.
+                You will be given a prompt and you will generate an assignment based on the prompt.
+                The assignment should be a detailed and comprehensive task that is suitable for students of all levels.
                 Format your response in markdown with proper headings, lists, and emphasis. 
                 If appropriate, include mermaid diagrams to visualize concepts. Include mermaid "Generate a valid Mermaid flowchart (text-based) using version 11.6.0 syntax. Please ensure: All special characters in node labels are enclosed in double quotes.
                 Mathematical expressions use plain text like n times (n-1) factorial.
@@ -33,6 +37,9 @@ export async function generateContent(prompt: string): Promise<string> {
                 4. C4Context
                 5. timeline
                 Dont include these at all costs. 
+                
+                Dont generate bigger charts/diagrams. 
+                Dont generate charts with more than 5 nodes.
 
                 Only Generate Assignment, dont include any other text which indicates that you are a chatbot. 
                 `,
@@ -60,10 +67,12 @@ export async function generateContent(prompt: string): Promise<string> {
 
     // Extract the text from the response
     const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text || ""
-    // Remove markdown code block delimiters if present
-    const cleanText = generatedText.replace(/^```markdown\n|```$/g, '')
-    console.log("genTxt",cleanText)
-    return cleanText
+    // Remove markdown code block delimiters only if they wrap the entire content
+    // const cleanText = generatedText.startsWith('```markdown\n') && generatedText.endsWith('```')
+    //   ? generatedText.slice(12, -3)
+    //   : generatedText
+    // console.log("genTxt",cleanText)
+    return generatedText
   } catch (error) {
     console.error("Error calling Gemini API:", error)
     throw error

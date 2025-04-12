@@ -20,7 +20,7 @@ export async function exportToPdf(element: HTMLElement) {
       
       // Clone the page with all descendants and ensure proper DOM structure
       const pageClone = page.cloneNode(true) as HTMLElement
-      //document.body.appendChild(pageClone)
+      document.body.appendChild(pageClone)
       
       // Make sure all content is visible for capture including hidden parts
       pageClone.style.position = 'absolute'
@@ -77,6 +77,9 @@ export async function exportToPdf(element: HTMLElement) {
       const imgData = canvas.toDataURL("image/png")
       pdf.addImage(imgData, "PNG", margin, currentHeight, imgWidth, imgHeight)
       currentHeight += imgHeight + margin;
+      
+      // Clean up cloned element
+      document.body.removeChild(pageClone);
     }
 
     pdf.save("assignment.pdf")

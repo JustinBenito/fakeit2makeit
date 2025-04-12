@@ -44,7 +44,7 @@ export function MermaidChart({ code }: MermaidChartProps) {
   return (
     <div className="mermaid-chart-container ">
       <div 
-        className="mermaid-chart mx-auto " 
+        className="mermaid-chart" 
         dangerouslySetInnerHTML={{ __html: svg }} 
       />
     </div>

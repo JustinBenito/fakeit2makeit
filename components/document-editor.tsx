@@ -10,12 +10,16 @@ interface DocumentEditorProps {
     text: string
     charts: { id: string; code: string }[]
     html: string
+    authorName: string
+    assignmentTitle: string
   }
   setContent: React.Dispatch<
     React.SetStateAction<{
       text: string
       charts: { id: string; code: string }[]
       html: string
+      authorName: string
+      assignmentTitle: string
     }>
   >
   onElementClick: (elementType: string) => void
@@ -47,7 +51,7 @@ export function DocumentEditor({ content, setContent, onElementClick }: Document
         // Process all content (text and charts) in order
         const textContent = tempDiv.innerHTML
         const words = textContent ? textContent.split(/\s+/) : []
-        const wordsPerPage = 220
+        const wordsPerPage = 210
         let currentPageWords: string[] = []
         let currentPageDiv = document.createElement("div")
         currentPageDiv.className = "a4-page"
@@ -141,14 +145,14 @@ export function DocumentEditor({ content, setContent, onElementClick }: Document
                 onClick={() => onElementClick("text")}
                 ref={index === 0 ? contentRef : undefined}
               >
-                 <div dangerouslySetInnerHTML={{ __html: pageHtml }} />
+                <div dangerouslySetInnerHTML={{ __html: pageHtml }} />
                 {pageHtml.includes('mermaid-chart') && (
-                  <div className="mermaid-chart-page w-full scale-75 max-w-[21cm] max-h-[30.7cm] overflow-clip">
+                  <div className=" w-[24.2cm] h-[30.7cm] ">
+                  <div className="mermaid-chart-page object-fit scale-75 origin-top">
                     <MermaidChart code={content.charts.find(c => pageHtml.includes(c.id))?.code || ''} />
                   </div>
+                  </div>
                 )}
-
-                
               </div>
             </div>
           ))
