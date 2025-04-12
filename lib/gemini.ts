@@ -17,7 +17,8 @@ export async function generateContent(prompt: string): Promise<string> {
                 {
                   text: `${prompt}. 
                 Format your response in markdown with proper headings, lists, and emphasis. 
-                If appropriate, include mermaid diagrams to visualize concepts. Include mermaid "Generate a valid Mermaid flowchart (text-based) using version 11.6.0 syntax. Please ensure: All special characters in node labels are enclosed in double quotes.
+                If appropriate, include mermaid diagrams to visualize concepts. 
+                Include mermaid "Generate a valid Mermaid flowchart (text-based) using version 11.6.0 syntax. Please ensure: All special characters in node labels are enclosed in double quotes.
                 Mathematical expressions use plain text like n times (n-1) factorial.
                 Use --> for arrows and proper indentation.
                 No invalid characters like *, (, ) or ! outside quotes.
@@ -27,7 +28,7 @@ export async function generateContent(prompt: string): Promise<string> {
             },
           ],
           generationConfig: {
-            temperature: 0.7,
+            temperature: 0.5,
             topK: 40,
             topP: 0.95,
             maxOutputTokens: 8192,

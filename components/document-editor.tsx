@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useRef, useEffect } from "react"
+import { useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Download } from "lucide-react"
@@ -26,105 +26,42 @@ interface DocumentEditorProps {
 }
 
 export function DocumentEditor({ content, setContent, onElementClick }: DocumentEditorProps) {
-  const [pages, setPages] = useState<string[]>([])
   const documentRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
-
-  // Split content into multiple pages if needed
-useEffect(() => {
-  // if (!contentRef.current || typeof window === 'undefined') return
-  const splitContentIntoPages = () => {
-    // Handle empty content case
-    console.log("Splitting content into pages...")
-    if (!content.html && content.charts.length === 0) {
-      setPages([""])
-      console.log("No content, setting empty page")
-      return
-    }
-
+  
+  // Process content on load to handle chart placeholders
+  useEffect(() => {
+    if (!contentRef.current || typeof window === 'undefined') return;
+    
     try {
-      const tempDiv = document.createElement("div")
-      tempDiv.className = "a4-content font-virgil"
-      tempDiv.innerHTML = content.html || ""
-      console.log("Content HTML:", content.html)
-      // Only process charts if they exist
-      if (content.charts.length > 0) {
+      // Only process if there's HTML content with potential chart placeholders
+      if (content.html) {
+        const container = contentRef.current;
+        
+        // Find and process chart placeholders
         content.charts.forEach((chart) => {
-          const chartPlaceholder = tempDiv.querySelector(`[data-chart-id="${chart.id}"]`)
-          if (chartPlaceholder) {
-            const chartContainer = document.createElement("div")
-            chartContainer.className = "my-4"
-            chartContainer.setAttribute("data-chart", chart.code)
-            chartPlaceholder.replaceWith(chartContainer)
+          const placeholder = container.querySelector(`[data-chart-id="${chart.id}"]`);
+          if (placeholder) {
+            // Create a marker to identify where charts should be rendered
+            const chartMarker = document.createElement("div");
+            chartMarker.setAttribute("data-chart-id", chart.id);
+            chartMarker.className = "chart-placeholder my-4";
+            placeholder.replaceWith(chartMarker);
           }
-        })
+        });
       }
-
-      // Append to document body temporarily for height calculation
-      tempDiv.style.visibility = 'hidden'
-      tempDiv.style.position = 'absolute'
-      document.body.appendChild(tempDiv)
-
-      // Calculate how many pages we need
-      const contentHeight = tempDiv.scrollHeight || 0
-      const pageHeight = 1043 // A4 height in pixels minus padding
-      // Ensure pageCount is at least 1 if we have content, even if height calculation returns 0
-      const pageCount = content.html || content.charts.length > 0 ? Math.max(1, Math.ceil(contentHeight / pageHeight)) : 0
-
-      // Create pages
-      const newPages: string[] = []
-      const contentElements = Array.from(tempDiv.children)
-
-      if (contentElements.length === 0 && content.html) {
-        // If no elements but we have HTML content, push the entire content
-        newPages.push(content.html)
-      } else if (pageCount <= 1) {
-        // If content fits in one page
-        newPages.push(tempDiv.innerHTML)
-      } else {
-        let currentPage = ""
-        let currentHeight = 0
-
-        contentElements.forEach((element) => {
-          const elementHeight = element.scrollHeight || 0
-
-          if (currentHeight + elementHeight > pageHeight && currentPage) {
-            newPages.push(currentPage)
-            currentPage = element.outerHTML
-            currentHeight = elementHeight
-          } else {
-            currentPage += element.outerHTML
-            currentHeight += elementHeight
-          }
-        })
-
-        if (currentPage) {
-          newPages.push(currentPage)
-        }
-      }
-
-      // Clean up
-      document.body.removeChild(tempDiv)
-      setPages(newPages)
-      console.log("Content split into", pageCount, "pages")
+      
+      console.log("Content processed successfully");
     } catch (error) {
-      console.error('Error splitting content into pages:', error)
-      setPages([content.html || ""])
+      console.error("Error processing content:", error);
     }
-  }
-
-  // Run the split function
-  splitContentIntoPages()
-}, [content.html, content.charts])
+  }, [content.html, content.charts]);
 
   const handleExportPdf = () => {
     if (documentRef.current) {
-      exportToPdf(documentRef.current)
+      exportToPdf(documentRef.current);
     }
   }
-
-
-  console.log(!contentRef.current)
 
   return (
     <div className="container mx-auto max-w-5xl">
@@ -146,36 +83,34 @@ useEffect(() => {
           <Card className="p-8 text-center">
             <p>No content available</p>
           </Card>
-        ) : pages.length === 0 ? (
-          <Card className="p-8 text-center">
-            <p>Loading content...</p>
-          </Card>
         ) : (
-          pages.map((pageHtml, index) => (
-            <div key={index} className="a4-paper">
-              <div
-                className="a4-content font-virgil"
-                onClick={() => onElementClick("text")}
-                ref={index === 0 ? contentRef : undefined}
-              >
-                <div dangerouslySetInnerHTML={{ __html: pageHtml }} />
-
-                {index === 0 &&
-                  content.charts.map((chart) => (
-                    <div
-                      key={chart.id}
-                      className="my-4"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        onElementClick("chart-" + chart.id)
-                      }}
-                    >
-                      <MermaidChart code={chart.code} />
-                    </div>
-                  ))}
-              </div>
+          <div className="a4-paper">
+            <div
+              className="a4-content font-virgil"
+              onClick={() => onElementClick("text")}
+              ref={contentRef}
+            >
+              {/* Safely render HTML content */}
+              {content.html && (
+                <div dangerouslySetInnerHTML={{ __html: content.html }} />
+              )}
+              
+              {/* Render charts */}
+              {content.charts.map((chart) => (
+                <div
+                  key={chart.id}
+                  className="my-4 chart-container"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onElementClick("chart-" + chart.id);
+                  }}
+                  data-chart-id={chart.id}
+                >
+                  <MermaidChart code={chart.code} />
+                </div>
+              ))}
             </div>
-          ))
+          </div>
         )}
       </div>
     </div>

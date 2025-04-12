@@ -8,6 +8,7 @@ interface MermaidChartProps {
 }
 
 export function MermaidChart({ code }: MermaidChartProps) {
+  const containerRef = useRef<HTMLDivElement>(null)
   const [svg, setSvg] = useState<string>("")
   const [error, setError] = useState<string | null>(null)
   const chartId = useRef(`mermaid-${Math.random().toString(36).substring(2, 11)}`)
@@ -24,7 +25,11 @@ export function MermaidChart({ code }: MermaidChartProps) {
       try {
         setError(null)
         const { svg } = await mermaid.render(chartId.current, code)
-        setSvg(svg)
+        // Make SVG responsive using viewBox and styles
+        const responsiveSvg = svg
+          .replace(/<svg[^>]*width="[^"]*"[^>]*height="[^"]*"/, '<svg style="width: 100%; height: auto;"')
+          .replace(/<svg /, '<svg preserveAspectRatio="xMidYMid meet" ')
+        setSvg(responsiveSvg)
       } catch (err) {
         console.error("Mermaid rendering error:", err)
         setError("Failed to render chart. Please check your syntax.")
@@ -38,5 +43,20 @@ export function MermaidChart({ code }: MermaidChartProps) {
     return <div className="p-4 text-red-500 border border-red-300 rounded-md">{error}</div>
   }
 
-  return <div className="mermaid-chart" dangerouslySetInnerHTML={{ __html: svg }} />
+  return (
+    <div
+      ref={containerRef}
+      className="mermaid-chart"
+      style={{
+        width: "100%",
+        maxWidth: "100%",
+        height: "auto",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        overflow: "hidden",
+      }}
+      dangerouslySetInnerHTML={{ __html: svg }}
+    />
+  )
 }
